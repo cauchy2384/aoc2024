@@ -20,7 +20,7 @@
         { 
             "label": "test",
             "type": "shell",
-            "command": "./gradlew test --tests \"aoc2024.*\"",
+            "command": "./gradlew test --tests \"D02*\"",
             "problemMatcher": []
         }
     ]

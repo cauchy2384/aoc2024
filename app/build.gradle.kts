@@ -40,7 +40,7 @@ java {
 
 application {
     // Define the main class for the application.
-    mainClass = "aoc2024.d01.AppKt"
+    mainClass = "aoc2024.Kt"
 }
 
 tasks.named<Test>("test") {
