@@ -6,7 +6,7 @@ class D03: Solution {
     override val day = 3
 
     override fun part1(reader: BufferedReader): Int {
-        val re = "mul\\((\\d+),(\\d+)\\)".toRegex()
+        val re = """mul\((\d+),(\d+)\)""".toRegex()
         return reader.lineSequence()
             .sumOf { 
                 re.findAll(it)
@@ -16,7 +16,7 @@ class D03: Solution {
     }
 
     override fun part2(reader: BufferedReader): Int {
-        val re = "mul\\((\\d+),(\\d+)\\)|(do\\(\\))|(don't\\(\\))".toRegex()
+        val re = """mul\((\d+),(\d+)\)|(do\(\))|(don't\(\))""".toRegex()
         return reader.lineSequence()
             .fold(true to 0) { (ok, sum), line ->
                 re.findAll(line)

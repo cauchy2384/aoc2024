@@ -2,5 +2,5 @@ package aoc2024
 
 class D04Test: SolutionTest(
     solution = D04(),
-    answers = Answers(null, null, null, null),
+    answers = Answers(18, 2557, 9, 1854),
 ) {}
