@@ -5,7 +5,7 @@ import java.io.BufferedReader
 typealias Element<T> = Triple<Int, Int, T>
 
 open class Matrix<T>(reader: BufferedReader, converter: (Char) -> T): Iterator<Element<T>> {
-    val rows: List<List<T>>
+    var rows: List<MutableList<T>>
     val m: Int 
     val n: Int
     private var index = 0
@@ -15,6 +15,7 @@ open class Matrix<T>(reader: BufferedReader, converter: (Char) -> T): Iterator<E
             .map {
                 it.toCharArray()
                     .map(converter)
+                    .toMutableList()
             }
             .toList()
 
@@ -39,6 +40,11 @@ open class Matrix<T>(reader: BufferedReader, converter: (Char) -> T): Iterator<E
         }
         return null 
     }
+
+    fun set(i: Int, j: Int, v: T) {
+        rows[i][j] = v
+    }
+
 
     fun isAt(i: Int, j: Int, c: T): Boolean {
         return get(i, j) == c
