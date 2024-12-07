@@ -3,7 +3,7 @@ package aoc2024
 import java.io.BufferedReader
 import java.util.TreeSet
 
-class D05: Solution {
+class D05: Solution<Int> {
     override val day = 5
 
     var rules = HashMap<Int, HashSet<Int>>()

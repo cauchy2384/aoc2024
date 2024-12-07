@@ -4,7 +4,7 @@ import java.io.BufferedReader
 
 import kotlin.math.abs
 
-class D01: Solution {
+class D01: Solution<Int> {
     override val day = 1
 
     override fun part1(reader: BufferedReader): Int {

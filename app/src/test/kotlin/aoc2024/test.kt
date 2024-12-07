@@ -5,11 +5,11 @@ import java.io.BufferedReader
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-data class Answers(
-    val part1Example: Int? = null,
-    val part1Input: Int? = null,
-    val part2Example: Int? = null,
-    val part2Input: Int? = null,
+data class Answers<T>(
+    val part1Example: T? = null,
+    val part1Input: T? = null,
+    val part2Example: T? = null,
+    val part2Input: T? = null,
 )
 
 data class Resources(
@@ -19,26 +19,24 @@ data class Resources(
     val part2Input: String = "input.txt",
 )
 
-abstract class SolutionTest(
-    val solution: Solution,
-    val answers: Answers,
+abstract class SolutionTest<T>(
+    val solution: Solution<T>,
+    val answers: Answers<T>,
     val resources: Resources = Resources(),
 ) {
-    companion object {
-        fun solve(filename: String, expected: Int?, solve: (BufferedReader) -> Int) {
-            if (expected == null) {
-                println("Test skipped")
-                return
+    fun solve(filename: String, expected: T?, solve: (BufferedReader) -> T) {
+        if (expected == null) {
+            println("Test skipped")
+            return
+        }
+        object {}.javaClass.getResourceAsStream(filename)?.use { stream ->
+            stream.bufferedReader().use { reader ->
+                val actual = solve(reader)
+                println("File: $filename, Expected: $expected, Actual: $actual")
+                assertEquals(expected, actual, "Expected value: $expected but got: $actual") 
             }
-            object {}.javaClass.getResourceAsStream(filename)?.use { stream ->
-                stream.bufferedReader().use { reader ->
-                    val actual = solve(reader)
-                    println("File: $filename, Expected: $expected, Actual: $actual")
-                    assertEquals(expected, actual, "Expected value: $expected but got: $actual") 
-                }
-            } ?: throw IllegalArgumentException("File not found: $filename")
-        } 
-    }
+        } ?: throw IllegalArgumentException("File not found: $filename")
+    } 
 
     fun resource(filename: String) = "/d%02d/%s".format(solution.day, filename)
 

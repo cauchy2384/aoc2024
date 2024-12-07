@@ -2,7 +2,7 @@ package aoc2024
 
 import java.io.BufferedReader
 
-class D03: Solution {
+class D03: Solution<Int> {
     override val day = 3
 
     override fun part1(reader: BufferedReader): Int {
