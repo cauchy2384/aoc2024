@@ -20,7 +20,7 @@
         { 
             "label": "test",
             "type": "shell",
-            "command": "./gradlew test --tests \"D08*\"",
+            "command": "./gradlew test --tests \"D1*\"",
             "problemMatcher": []
         }
     ]
