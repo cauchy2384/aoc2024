@@ -5,8 +5,7 @@ class D17Test: SolutionTest<String>(
     answers = Answers(
         "4,6,3,5,6,3,5,2,1,0", 
         "7,3,1,3,6,3,6,0,2",
-        // "117440",
-        null,
+        "117440",
         "105843716614554",
     ),
     resources = Resources(
