@@ -4,13 +4,13 @@ import java.io.BufferedReader
 
 typealias Element<T> = Triple<Int, Int, T>
 
-open class Matrix<T>(reader: BufferedReader, converter: (Char) -> T): Iterator<Element<T>> {
-    var rows: List<MutableList<T>>
-    val m: Int 
-    val n: Int
+open class Matrix<T>(): Iterator<Element<T>> {
+    var rows: List<MutableList<T>> = listOf()
+    var m: Int = 0
+    var n: Int = 0
     private var index = 0
 
-    init {
+    constructor(reader: BufferedReader, converter: (Char) -> T): this() {
         rows = reader.lineSequence()
             .map {
                 it.toCharArray()
@@ -21,6 +21,12 @@ open class Matrix<T>(reader: BufferedReader, converter: (Char) -> T): Iterator<E
 
         m = rows.size
         n = if (m > 0) rows[0].size else 0
+    }
+
+    constructor(_m: Int, _n: Int, value: T): this() {
+        rows = List(_m) { MutableList(_n) { value } }
+        m = _m
+        n = _n
     }
 
     override fun hasNext(): Boolean {
