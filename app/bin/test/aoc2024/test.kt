@@ -4,6 +4,7 @@ import java.io.BufferedReader
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.time.measureTime
 
 data class Answers<T>(
     val part1Example: T? = null,
@@ -29,13 +30,16 @@ abstract class SolutionTest<T>(
             println("Test skipped")
             return
         }
-        object {}.javaClass.getResourceAsStream(filename)?.use { stream ->
-            stream.bufferedReader().use { reader ->
-                val actual = solve(reader)
-                println("File: $filename, Expected: $expected, Actual: $actual")
-                assertEquals(expected, actual, "Expected value: $expected but got: $actual") 
-            }
-        } ?: throw IllegalArgumentException("File not found: $filename")
+        val elapsedTime = measureTime {
+            object {}.javaClass.getResourceAsStream(filename)?.use { stream ->
+                stream.bufferedReader().use { reader ->
+                    val actual = solve(reader)
+                    println("File: $filename, Expected: $expected, Actual: $actual")
+                    assertEquals(expected, actual, "Expected value: $expected but got: $actual") 
+                }
+            } ?: throw IllegalArgumentException("File not found: $filename")
+        }
+        println("Elapsed time: $elapsedTime")
     } 
 
     fun resource(filename: String) = "/d%02d/%s".format(solution.day, filename)

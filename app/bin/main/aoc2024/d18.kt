@@ -45,36 +45,37 @@ class D18(val limit: Int, val bytes: Int): Solution<Long> {
             for ((dx, dy) in listOf(-1 to 0, 1 to 0, 0 to -1, 0 to 1)) {
                 val nx = x + dx
                 val ny = y + dy
-
+                
+                if (mx.get(nx, ny) != '.' || visited.contains(nx to ny)) {
+                    continue
+                }
                 queue.add(element = Triple(nx, ny, d + 1))
             }
         }
 
-        return -1L
+        return Long.MAX_VALUE
     }
 
     override fun part2(reader: BufferedReader): Long {
         val (m, n) = limit + 1 to limit + 1
-        val mx = Matrix(m, n, '.')
-
         val start = 0 to 0
         val target = limit to limit
 
-        reader.lineSequence()
+        val blocks = reader.lineSequence()
             .map{ it.split(",") }
             .map{ it[0].toInt() to it[1].toInt() }
-            .withIndex()
-            .forEach {  
-                (i, c) ->
-                    val (x, y) = c
-                    mx.set(y, x, '#')
-                    val p = bfs(mx, start, target)
-                    if (p == -1L) {
-                        // println("$x,$y")
-                        return i.toLong()
-                    }
-            }
+            .toList()
 
-        return -1L
+        fun cmp(i: Int): Long {
+            val mx = Matrix(m, n, '.')
+            blocks.take(i).forEach{ (x, y) -> mx.set(y, x, '#') } 
+            return bfs(mx, start, target)
+        }
+
+        return binarySearchFirstOccurrence(
+                blocks.size,
+                ::cmp,
+                Long.MAX_VALUE,
+            ) - 1L
     }
 }
