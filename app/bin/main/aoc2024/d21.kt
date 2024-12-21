@@ -4,6 +4,7 @@ import java.io.BufferedReader
 import java.util.PriorityQueue
 
 import kotlin.math.abs
+import kotlin.math.min
 
 class D21(val last: Int): Solution<Long> {
     override val day = 21
@@ -11,7 +12,7 @@ class D21(val last: Int): Solution<Long> {
     override fun part1(reader: BufferedReader): Long {
         var ans = reader.lineSequence()
             .map{ 
-                it to score(it, last)
+                it to score(it, last, Long.MAX_VALUE)
              }
             .map{ (_a, _b) -> 
                 val a = _a.filter { it.isDigit() }.toLong()
@@ -25,15 +26,10 @@ class D21(val last: Int): Solution<Long> {
 
     override fun part2(reader: BufferedReader): Long {
         var ans = reader.lineSequence()
-            .map{ 
-                println(it)
-                it to score(it, 26)
-            }
+            .map{ it to score(it, last, Long.MAX_VALUE) }
             .map{ (_a, _b) -> 
-                println("$_a $_b")
                 val a = _a.filter { it.isDigit() }.toLong()
                 val b = _b
-                println("$b * $a")
                 a * b
             }
             .sum() 
@@ -44,33 +40,56 @@ class D21(val last: Int): Solution<Long> {
     var numeric: NumericKeypad = NumericKeypad()
     var directional: DirectionalKeypad = DirectionalKeypad()
 
-    // val caches = Array(26) { mutableMapOf<String, Int>() }
+    val cache = mutableMapOf<Pair<String, Int>, Long>()
 
-    fun score(input: String, level: Int): Int {
-        // println("$level $input")
-        var ans = 0
+    fun score(input: String, level: Int, best: Long): Long {
+        if (cache.containsKey(input to level)) {
+            return cache[input to level]!!
+        }
+
+        var ans = 0L
 
         when (level) {
             0 -> {
-                ans = directional.typeMany(input)
-                    .map{ it.length }
-                    .min()
+                val (_y, _x) = directional.getc('A')
+                directional.y = _y
+                directional.x = _x
+        
+                return input.map{ c ->
+                    val v = directional.opts(c).map{ it.length }.min()        
+                    val (y, x) = directional.getc(c)
+                    directional.x = x
+                    directional.y = y
+                    v.toLong()
+                }.sum()
             }
             last -> {
-                ans = numeric.typeMany(input)
-                    .map{ score(it, level - 1) }
-                    .min()
+                ans = Long.MAX_VALUE
+                for(s in numeric.typeMany(input)) {
+                    ans = min(score(s, level - 1, ans), ans) 
+                }
             }
             else -> {
-                ans = directional.typeMany(input)
-                    .map{ score(it, level - 1) }
-                    .min()     
+                val (_y, _x) = directional.getc('A')
+                directional.y = _y
+                directional.x = _x
+        
+                for (c in input) {
+                    ans += directional.opts(c).map{ score(it, level - 1, best) }.min()        
+                    if (ans > best) {
+                        return Long.MAX_VALUE
+                    }
+                    val (y, x) = directional.getc(c)
+                    directional.x = x
+                    directional.y = y
+                }
             }
         }
 
+        cache[input to level] = ans
+
         return ans
     }
-
 }
 
 open class Keypad {
@@ -139,7 +158,6 @@ open class Keypad {
                 continue
             }
             if (rows[y][x] == c) {
-                // println("$c $path ${path.length} $best")
                 if (path.length < best) {
                     best = path.length
                     res = mutableListOf()
@@ -165,16 +183,6 @@ open class Keypad {
         return res
     }
 
-    fun type(input: String): String {
-        var ans = ""
-        
-        input.forEach{
-            ans += typeChar(it)
-        }
-
-        return ans
-    }
-
     val directions = mapOf(
         '^' to (-1 to 0),
         'v' to (1 to 0),
@@ -188,80 +196,6 @@ open class Keypad {
         val c: Char,
         val p: String,
     )
-
-    fun typeChar(c: Char): String {
-        if (rows[y][x] == c) {
-            return "A"
-        }
-
-        val res = mutableListOf<String>()
-        val q = ArrayDeque<Element>()
-        q.add(Element(y, x, '.', ""))
-
-        val visited = HashSet<Pair<Int, Int>>()
-        while(q.isNotEmpty()) {
-            val el = q.removeFirst()
-            val (y, x, pc, path) = el
-
-            if (visited.contains(y to x)) {
-                continue
-            }
-            visited.add(y to x)
-            if (y < 0 || y >= rows.size || x < 0 || x >= rows[y].size) {
-                continue
-            }
-            if (rows[y][x] == c) {
-                this.y = y
-                this.x = x
-                path.toCharArray()
-                    .sortedWith(
-                        compareBy( { -dist(it) })
-                    )
-                    .joinToString("")
-                return path + 'A'
-            }
-            if (rows[y][x] == '#') {
-                continue
-            }
-
-            if (pc != '.') {
-                val (dy, dx) = directions[pc]!!
-                q.add(Element(y + dy, x + dx, pc, path + pc))
-            }
-            for (dir in directions.keys) {
-                if (dir == pc) {
-                    continue
-                }
-                val (dy, dx) = directions[dir]!!
-                q.add(Element(y + dy, x + dx, dir, path + dir))
-            } 
-        }
-
-        return "!!!!!!!!!!!!!!"
-    }
-
-    fun reverse(input: String): String {
-        var ans = ""
-
-        var (y, x) = this.y to this.x
-        for (c in input) {
-            if (c != 'A') {
-                val (dy, dx) = directions[c]!!
-                y += dy
-                x += dx
-            } else {
-                ans += rows[y][x]
-            }
-        }
-
-        return ans
-    }
-
-    fun dist(c: Char): Int {
-        val (ya, xa) = getc('A')      
-        val (y, x) = getc(c)
-        return abs(ya - y) + abs(xa - x)      
-    }
 
     fun getc(c: Char): Pair<Int, Int> {
         for (i in rows.indices) {
